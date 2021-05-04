@@ -15,7 +15,8 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class Post {
     @Id
-    Integer id;
-    String title;
-    String body;
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    private Integer id;
+    private String title;
+    private String body;
 }
