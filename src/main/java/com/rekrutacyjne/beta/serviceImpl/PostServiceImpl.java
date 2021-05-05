@@ -1,21 +1,21 @@
 package com.rekrutacyjne.beta.serviceImpl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rekrutacyjne.beta.entity.Post;
-import com.rekrutacyjne.beta.entity.PostDto;
-import com.rekrutacyjne.beta.mapper.PostMapper;
 import com.rekrutacyjne.beta.repository.PostRepository;
 import com.rekrutacyjne.beta.service.PostService;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Component
 public class PostServiceImpl implements PostService{
+    private static final Logger logger = LoggerFactory.getLogger(PostServiceImpl.class);
 
     @Autowired
     private PostRepository postRepository;
@@ -41,6 +43,11 @@ public class PostServiceImpl implements PostService{
                 .setSSLSocketFactory(sslConnectionSocketFactory)
                 .build();
     }
+    //raz dziennie o 15-stej
+    @Scheduled(cron = "0 15 * * *")
+    public void saveSheduledDataFromExternalApi() throws NoSuchAlgorithmException, KeyManagementException {
+        this.saveDataFromExternalApi();
+    }
 
     public Optional<List<Post>> readFromExternalApi() throws KeyManagementException, NoSuchAlgorithmException {
         RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory(getHttpClient()));
@@ -52,7 +59,7 @@ public class PostServiceImpl implements PostService{
         return Optional.of(post);
     }
     @Override
-    public Optional<List<Post>> saveDataFromExternalApi() throws NoSuchAlgorithmException, KeyManagementException, JsonProcessingException {
+    public Optional<List<Post>> saveDataFromExternalApi() throws NoSuchAlgorithmException, KeyManagementException{
         List<Post> posts = readFromExternalApi().get();
         List<Post> newAddedPosts = new ArrayList<>();
         if(posts != null) {
