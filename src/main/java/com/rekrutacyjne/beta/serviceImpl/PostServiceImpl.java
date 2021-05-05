@@ -43,8 +43,8 @@ public class PostServiceImpl implements PostService{
                 .setSSLSocketFactory(sslConnectionSocketFactory)
                 .build();
     }
-    //raz dziennie o 15-stej
-    @Scheduled(cron = "0 15 * * *")
+    //raz dziennie o 6-stej
+    @Scheduled(cron = "0 0 6 * * *")
     public void saveSheduledDataFromExternalApi() throws NoSuchAlgorithmException, KeyManagementException {
         this.externalApiDataExceptDeletedAndModified();
     }
