@@ -46,7 +46,7 @@ public class PostServiceImpl implements PostService{
     //raz dziennie o 15-stej
     @Scheduled(cron = "0 15 * * *")
     public void saveSheduledDataFromExternalApi() throws NoSuchAlgorithmException, KeyManagementException {
-        this.saveDataFromExternalApi();
+        this.externalApiDataExceptDeletedAndModified();
     }
 
     public Optional<List<Post>> readFromExternalApi() throws KeyManagementException, NoSuchAlgorithmException {
@@ -66,6 +66,23 @@ public class PostServiceImpl implements PostService{
             for (Post i : posts) {
                 if(i != null) {
                     if(!existsById(i.getId())) {
+                        this.save(i);
+                        newAddedPosts.add(i);
+                    }
+                }
+            }
+        }
+        return Optional.of(newAddedPosts);
+    }
+    @Override
+    public Optional<List<Post>> externalApiDataExceptDeletedAndModified() throws NoSuchAlgorithmException, KeyManagementException{
+        List<Post> posts = readFromExternalApi().get();
+        Post lastElement = postRepository.findTopByOrderByIdDesc().get();
+        List<Post> newAddedPosts = new ArrayList<>();
+        if(posts != null) {
+            for (Post i : posts) {
+                if(i != null) {
+                    if(!existsById(i.getId()) && lastElement.getId()<i.getId()) {
                         this.save(i);
                         newAddedPosts.add(i);
                     }

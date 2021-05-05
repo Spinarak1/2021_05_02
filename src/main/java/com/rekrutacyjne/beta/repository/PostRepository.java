@@ -11,4 +11,5 @@ import java.util.Optional;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer>{
     Optional<List<Post>> findByTitleContaining(String name);
+    Optional<Post> findTopByOrderByIdDesc();
 }

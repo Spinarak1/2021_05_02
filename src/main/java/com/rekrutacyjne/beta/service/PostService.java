@@ -19,5 +19,6 @@ public interface PostService {
     Post save(Post post);
     Optional<List<Post>> saveDataFromExternalApi() throws NoSuchAlgorithmException, KeyManagementException, JsonProcessingException;
     Optional<List<Post>> fiterDataFromExternalApi(String title) throws NoSuchAlgorithmException, KeyManagementException;
+    public Optional<List<Post>> externalApiDataExceptDeletedAndModified() throws NoSuchAlgorithmException, KeyManagementException;
     //ResponseEntity<List<Post>> getPostsByTitle(String title);
 }
